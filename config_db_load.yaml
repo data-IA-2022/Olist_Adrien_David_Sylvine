@@ -26,7 +26,6 @@ tables:
         na_values:          None
         primary_keys:       ['customer_id']
         multi_foreign_keys:
-
             customer_zip_code_prefix:   geolocation.geolocation_zip_code_prefix
             customer_city:              geolocation.geolocation_city
             customer_state:             geolocation.geolocation_state
@@ -46,7 +45,6 @@ tables:
         na_values:          None
         primary_keys:       ['seller_id']
         multi_foreign_keys:
-
             seller_zip_code_prefix:    geolocation.geolocation_zip_code_prefix
             seller_city:                geolocation.geolocation_city
             seller_state:               geolocation.geolocation_state

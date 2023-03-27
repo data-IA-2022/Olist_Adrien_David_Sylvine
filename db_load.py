@@ -58,7 +58,7 @@ global_time = time.time()
 ##### Boucle création des tables
 print("Création des tables :", end='\n\n')
 
-list_references = []
+dict_references = {}
 
 n_table = 0
 for table_name in table_names:
@@ -74,8 +74,8 @@ for table_name in table_names:
 
             reference = table_config['foreign_keys'][column_name]
 
-            if reference not in list_references:
-                list_references.append(reference)
+            if reference not in dict_references:
+                dict_references[reference.split('.')[0]] = pd.Series(name=reference.split('.')[1])
 
             columns.append(Column(
                 column_name,
@@ -92,22 +92,15 @@ for table_name in table_names:
 
     if 'multi_foreign_keys' in table_config:
 
-        FK_cols = []
-        FK_refs = []
+        FK_cols, FK_refs = zip(*table_config['multi_foreign_keys'].items())
 
-        for col, reference in table_config['multi_foreign_keys'].items():
-
-            if reference not in list_references:
-                list_references.append(reference)
-
-            FK_cols.append(col)
-            FK_refs.append(reference)
+        dict_references[FK_refs[0].split('.')[0]] = pd.DataFrame(columns=[k.split('.')[1] for k in FK_refs])
 
         Table(
             table_name,
             meta,
             *columns,
-            ForeignKeyConstraint(FK_cols, FK_refs)
+            ForeignKeyConstraint(FK_cols, FK_refs),
         )
 
     else:
@@ -119,7 +112,7 @@ for table_name in table_names:
 
     print(f"{n_table:2}/{len(table_names)} - {table_name}")
 
-print("\nReferences à vérifier :", ', '.join(list_references), end='\n\n')
+print("\nReferences à vérifier :", ', '.join(dict_references.keys()), end='\n\n')
 
 meta.create_all(engine)
 
@@ -127,8 +120,6 @@ conn = engine.connect()
 
 ##### Boucle remplissage des tables
 print("Remplissage des tables :", end='\n\n')
-
-dict_references = {k: [] for k in list_references}
 
 n_table = 0
 for table_name in table_names:
@@ -168,14 +159,16 @@ for table_name in table_names:
 
             df = df[list(column_types.keys())]
 
-            names_references = [k for k in dict_references.keys() if k.split('.')[0] == table_name]
+            names_references = [k for k in dict_references.keys() if k == table_name]
 
             for name_reference in names_references:
-                dict_references[name_reference] += df[name_reference.split('.')[1]].tolist()
+
+                a = dict_references[name_reference]
+                dict_references[name_reference] = pd.concat(a, df[a.name if type(a) == pd.Series else a.columns], ignore_index=True)
 
             for FK_cols, FK_refs in table_config.get('foreign_keys', {}).items():
 
-                ok = df[FK_cols].isin(dict_references[FK_refs])
+                ok = df[FK_cols].isin(dict_references[FK_refs.split('.')[0]])
 
                 if not df[~ok].empty:
                     df[~ok].to_sql(table_name + '_echecs', conn, dtype = column_types, if_exists='append', index=False)
@@ -184,15 +177,11 @@ for table_name in table_names:
 
             if multi_fk := table_config.get('multi_foreign_keys'):
 
-                ok = None
-                print(multi_fk)
-                for FK_cols, FK_refs in multi_fk.items():
+                FK_cols, FK_refs = zip(*table_config['multi_foreign_keys'].items())
+                FK_refs = [k.split('.')[1] for k in FK_refs]
 
-                    if ok is None:
-                        ok = df[FK_cols].isin(dict_references[FK_refs])
-                    else:
-                        ok = ok & df[FK_cols].isin(dict_references[FK_refs])
-                    print(ok)
+                ok = df.apply(lambda z: (z[FK_cols] == df[FK_refs]).all(1).any(), axis=1)
+
                 if not df[~ok].empty:
                     df[~ok].to_sql(table_name + '_echecs', conn, dtype = column_types, if_exists='append', index=False)
 
