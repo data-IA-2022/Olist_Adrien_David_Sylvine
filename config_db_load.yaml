@@ -1,0 +1,158 @@
+param:
+
+    chunksize:              10
+    folder:                 'data'
+
+tables:
+
+    geolocation:
+
+        name_file:          olist_geolocation_dataset.csv
+        gzip:               False
+        na_values:          None
+        primary_keys:       ['geolocation_zip_code_prefix', 'geolocation_city', 'geolocation_state']
+        column_types:
+
+            geolocation_zip_code_prefix:    INTEGER
+            geolocation_city:               VARCHAR 50
+            geolocation_state:              CHAR 2
+            geolocation_lat:                FLOAT
+            geolocation_lng:                FLOAT
+
+    customers:
+
+        name_file:          olist_customers_dataset.csv
+        gzip:               False
+        na_values:          None
+        primary_keys:       ['customer_id']
+        multi_foreign_keys:
+
+            customer_zip_code_prefix:   geolocation.geolocation_zip_code_prefix
+            customer_city:              geolocation.geolocation_city
+            customer_state:             geolocation.geolocation_state
+
+        column_types:
+
+            customer_id:                CHAR 32
+            customer_unique_id:         CHAR 32
+            customer_zip_code_prefix:   INTEGER
+            customer_city:              VARCHAR 50
+            customer_state:             CHAR 2
+
+    sellers:
+
+        name_file:          olist_sellers_dataset.csv
+        gzip:               False
+        na_values:          None
+        primary_keys:       ['seller_id']
+        multi_foreign_keys:
+
+            seller_zip_code_prefix:    geolocation.geolocation_zip_code_prefix
+            seller_city:                geolocation.geolocation_city
+            seller_state:               geolocation.geolocation_state
+
+        column_types:
+
+            seller_id:                CHAR 32
+            seller_zip_code_prefix:   INTEGER
+            seller_city:              VARCHAR 50
+            seller_state:             CHAR 2
+
+    products:
+
+        name_file:          olist_products_dataset.csv
+        gzip:               False
+        na_values:          None
+        primary_keys:       ['product_id']
+        column_types:
+
+            product_id:                 CHAR 32
+            product_category_name:      VARCHAR 50
+            product_name_lenght:        SMALLINT
+            product_description_lenght: SMALLINT
+            product_photos_qty:         SMALLINT
+            product_weight_g:           INTEGER
+            product_length_cm:          SMALLINT
+            product_height_cm:          SMALLINT
+            product_width_cm:           SMALLINT
+
+    orders:
+
+        name_file:          olist_orders_dataset.csv
+        gzip:               False
+        na_values:          None
+        primary_keys:       ['order_id']
+        foreign_keys:
+
+            customer_id:    customers.customer_id
+
+        column_types:
+
+            order_id:                       CHAR 32
+            customer_id:                    CHAR 32
+            order_status:                   VARCHAR 15
+            order_purchase_timestamp:       TIMESTAMP
+            order_approved_at:              TIMESTAMP
+            order_delivered_carrier_date:   TIMESTAMP
+            order_delivered_customer_date:  TIMESTAMP
+            order_estimated_delivery_date:  TIMESTAMP
+
+    order_items:
+
+        name_file:          olist_order_items_dataset.csv
+        gzip:               False
+        na_values:          None
+        primary_keys:       ['order_id', 'order_item_id']
+        foreign_keys:
+
+            order_id:   orders.order_id
+            product_id: products.product_id
+            seller_id:  sellers.seller_id
+
+        column_types:
+
+            order_id:               CHAR 32
+            order_item_id:          SMALLINT
+            product_id:             CHAR 32
+            seller_id:              CHAR 32
+            shipping_limit_date:    TIMESTAMP
+            price:                  FLOAT
+            freight_value:          FLOAT
+
+    order_reviews:
+
+        name_file:          olist_order_reviews_dataset.csv
+        gzip:               False
+        na_values:          None
+        primary_keys:       ['review_id', 'order_id']
+        foreign_keys:
+
+            order_id:   orders.order_id
+
+        column_types:
+
+            review_id:                  CHAR 32
+            order_id:                   CHAR 32
+            review_score:               SMALLINT
+            review_comment_title:       VARCHAR 50
+            review_comment_message:     TEXT
+            review_creation_date:       TIMESTAMP
+            review_answer_timestamp:    TIMESTAMP
+
+    order_payments:
+
+        name_file:          olist_order_payments_dataset.csv
+        gzip:               False
+        na_values:          None
+        primary_keys:       ['order_id', 'payment_sequential']
+        foreign_keys:
+
+            order_id:   orders.order_id
+
+        column_types:
+
+            order_id:               CHAR 32
+            payment_sequential:     SMALLINT
+            payment_type:           VARCHAR 15
+            payment_installments:   SMALLINT
+            payment_value:          FLOAT
