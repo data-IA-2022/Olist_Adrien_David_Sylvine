@@ -1,6 +1,6 @@
 param:
 
-    chunksize:              10
+    chunksize:              5_000_000
     folder:                 'data'
 
 tables:

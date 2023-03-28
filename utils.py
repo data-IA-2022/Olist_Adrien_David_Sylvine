@@ -27,10 +27,10 @@ def connect_ssh_tunnel(config_file):
     # Read configuration information from file
     config = yaml.safe_load(open(config_file, 'r'))
 
-    if config["ssh_tunnel"] not in config:
+    if config["ssh_section"] not in config:
         return None
 
-    ssh_config = config[config["ssh_tunnel"]]
+    ssh_config = config[config["ssh_section"]]
 
     server = SSHTunnelForwarder(
         ssh_config['host'],

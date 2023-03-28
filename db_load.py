@@ -75,7 +75,7 @@ for table_name in table_names:
             reference = table_config['foreign_keys'][column_name]
 
             if reference not in dict_references:
-                dict_references[reference.split('.')[0]] = pd.Series(name=reference.split('.')[1])
+                dict_references[reference] = pd.Series(name=reference.split('.')[1])
 
             columns.append(Column(
                 column_name,
@@ -94,7 +94,7 @@ for table_name in table_names:
 
         FK_cols, FK_refs = zip(*table_config['multi_foreign_keys'].items())
 
-        dict_references[FK_refs[0].split('.')[0]] = pd.DataFrame(columns=[k.split('.')[1] for k in FK_refs])
+        dict_references[FK_refs[0].split('.')[0] + '..'] = pd.DataFrame(columns=[k.split('.')[1] for k in FK_refs])
 
         Table(
             table_name,
@@ -132,7 +132,7 @@ for table_name in table_names:
 
     print(f"{n_table:2}/{len(table_names)} - {table_name} - nombre de lignes : ", end='')
 
-    nb_lines = sum(1 for _ in (gzip.open(path) if table_config.get('gzip') else open(path))) - 1
+    nb_lines = sum(1 for _ in (gzip.open(path) if table_config.get('gzip') else open(path, encoding='utf-8'))) - 1
 
     print(f"{nb_lines:,}")
 
@@ -159,16 +159,9 @@ for table_name in table_names:
 
             df = df[list(column_types.keys())]
 
-            names_references = [k for k in dict_references.keys() if k == table_name]
-
-            for name_reference in names_references:
-
-                a = dict_references[name_reference]
-                dict_references[name_reference] = pd.concat(a, df[a.name if type(a) == pd.Series else a.columns], ignore_index=True)
-
             for FK_cols, FK_refs in table_config.get('foreign_keys', {}).items():
 
-                ok = df[FK_cols].isin(dict_references[FK_refs.split('.')[0]])
+                ok = df[FK_cols].isin(dict_references[FK_refs])
 
                 if not df[~ok].empty:
                     df[~ok].to_sql(table_name + '_echecs', conn, dtype = column_types, if_exists='append', index=False)
@@ -178,14 +171,27 @@ for table_name in table_names:
             if multi_fk := table_config.get('multi_foreign_keys'):
 
                 FK_cols, FK_refs = zip(*table_config['multi_foreign_keys'].items())
+                table_ref = FK_refs[0].split('.')[0]
                 FK_refs = [k.split('.')[1] for k in FK_refs]
 
-                ok = df.apply(lambda z: (z[FK_cols] == df[FK_refs]).all(1).any(), axis=1)
+                dict_rename = {k: v for k, v in zip(FK_cols, FK_refs)}
+
+                df_to_compare = df[list(FK_cols)].rename(columns=dict_rename)
+                dict_ref_to_compare = dict_references[table_ref + '..']
+
+                ok = df_to_compare.apply(lambda z: (z == dict_ref_to_compare).all(1).any(), axis=1)
 
                 if not df[~ok].empty:
                     df[~ok].to_sql(table_name + '_echecs', conn, dtype = column_types, if_exists='append', index=False)
 
                 df = df[ok]
+
+            names_references = [k for k in dict_references.keys() if k.split('.')[0] == table_name]
+
+            for name_reference in names_references:
+
+                a = dict_references[name_reference]
+                dict_references[name_reference] = pd.concat((a, df[a.name if type(a) == pd.Series else a.columns]), ignore_index=True)
 
             df.to_sql(table_name, conn, dtype = column_types, if_exists='append', index=False)
 
