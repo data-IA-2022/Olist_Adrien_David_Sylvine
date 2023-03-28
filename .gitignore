@@ -1,5 +1,11 @@
 # Python Env
 olist
-
+__pycache__
 # folder
 dataset
+
+# IPython
+.ipynb_checkpoints
+
+# config_file
+config_local_david.yml
