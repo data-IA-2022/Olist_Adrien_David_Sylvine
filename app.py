@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # connexion à la BDD
 # vers la VM
-# conn = psycopg2.connect("postgresql://Groupe2_ADS:Groupe2_ADSroot@groupe2-ads.francecentral.cloudapp.azure.com:5432/OList") # adapter pour accéder au port 172.17.0.2 aussi
+# conn =  # adapter pour accéder au port 172.17.0.2 
 
 # en local
 connection = psycopg2.connect("postgresql://postgres:postgres@localhost:5432/OList")
