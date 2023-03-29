@@ -137,3 +137,5 @@ test.py
 config_vm.yaml
 .venv
 BDD_sylvine
+drop_for_geoloc.ipynb
+utils.cpython-39.pyc

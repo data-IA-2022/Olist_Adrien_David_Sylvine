@@ -5,12 +5,36 @@ param:
 
 tables:
 
+    brazil_states:
+
+        name_file:          brazil_states.csv
+        gzip:               False
+        na_values:          None
+        primary_keys:       ['abbreviation']
+
+        column_types:
+
+            abbreviation:           CHAR 2
+            state:                  VARCHAR 20
+            capitol_city:           VARCHAR 15
+            region:                 VARCHAR 12
+            size_km2:               INTEGER
+            population_2007:        INTEGER
+            perc_pop_urb:           FLOAT
+            municipal_districts:    INTEGER
+            per_capita_gnp:         INTEGER
+            life_expectancy:        FLOAT
+
     geolocation:
 
         name_file:          olist_geolocation_dataset.csv
         gzip:               False
         na_values:          None
         primary_keys:       ['geolocation_zip_code_prefix', 'geolocation_city', 'geolocation_state']
+        foreign_keys:
+
+            geolocation_state:    brazil_states.abbreviation
+
         column_types:
 
             geolocation_zip_code_prefix:    INTEGER
@@ -154,3 +178,15 @@ tables:
             payment_type:           VARCHAR 15
             payment_installments:   SMALLINT
             payment_value:          FLOAT
+
+    product_category_name_translation:
+
+        name_file:          product_category_name_translation.csv
+        gzip:               False
+        na_values:          None
+        primary_keys:       ['product_category_name']
+
+        column_types:
+
+            product_category_name:             VARCHAR 50
+            product_category_name_english:     VARCHAR 50
