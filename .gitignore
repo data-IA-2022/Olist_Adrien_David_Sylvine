@@ -139,3 +139,13 @@ config_vm.yaml
 BDD_sylvine
 drop_for_geoloc.ipynb
 utils.cpython-39.pyc
+__pycache__
+# folder
+dataset
+
+# IPython
+.ipynb_checkpoints
+
+# config_file
+config_local_david.yaml
+config_db_load_local.yaml

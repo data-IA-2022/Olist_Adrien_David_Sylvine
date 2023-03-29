@@ -76,3 +76,15 @@ def connect_to_db(config_file):
         from sqlalchemy import create_engine
 
         return create_engine(url)
+from os.path import join, dirname
+import yaml
+from sqlalchemy import create_engine
+
+def get_config(cnx):
+    config_file = relative_path("config_local_david.yaml")
+    with open(config_file, 'r') as f:
+        config = yaml.safe_load(f)
+    cfg=config[cnx]
+    if cnx == 'PG':
+        url = "{driver}://{user}:{password}@{host}:{port}/{database}".format(**cfg)
+        return create_engine(url)
