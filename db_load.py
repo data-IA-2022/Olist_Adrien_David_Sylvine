@@ -159,14 +159,20 @@ for table_name in table_names:
 
             df = df[list(column_types.keys())]
 
-            for FK_cols, FK_refs in table_config.get('foreign_keys', {}).items():
+            for FK_col, FK_ref in table_config.get('foreign_keys', {}).items():
 
-                ok = df[FK_cols].isin(dict_references[FK_refs])
+                ok = df[FK_col].isin(dict_references[FK_ref])
 
                 if not df[~ok].empty:
-                    df[~ok].to_sql(table_name + '_echecs', conn, dtype = column_types, if_exists='append', index=False)
 
-                df = df[ok]
+                    if table_config.get("if_echec") == "table":
+
+                        df[~ok].to_sql(table_name + '_echecs', conn, dtype = column_types, if_exists='append', index=False)
+                        df = df[ok]
+
+                    if table_config.get("if_echec") == "impute":
+
+                        df[~ok] = df[~ok].apply(lambda col: col if col.name != FK_col else None)
 
             if multi_fk := table_config.get('multi_foreign_keys'):
 

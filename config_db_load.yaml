@@ -10,6 +10,7 @@ tables:
         name_file:          brazil_states.csv
         gzip:               False
         na_values:          None
+        if_echec:           table
         primary_keys:       ['abbreviation']
 
         column_types:
@@ -27,10 +28,11 @@ tables:
 
     geolocation:
 
-        name_file:          olist_geolocation_dataset.csv
+        name_file:          clean_geolocation.csv
         gzip:               False
         na_values:          None
-        primary_keys:       ['geolocation_zip_code_prefix', 'geolocation_city', 'geolocation_state']
+        if_echec:           table
+        primary_keys:       ['geolocation_zip_code_prefix']
         foreign_keys:
 
             geolocation_state:    brazil_states.abbreviation
@@ -48,43 +50,40 @@ tables:
         name_file:          olist_customers_dataset.csv
         gzip:               False
         na_values:          None
+        if_echec:           impute
         primary_keys:       ['customer_id']
-        multi_foreign_keys:
+        foreign_keys:
+
             customer_zip_code_prefix:   geolocation.geolocation_zip_code_prefix
-            customer_city:              geolocation.geolocation_city
-            customer_state:             geolocation.geolocation_state
 
         column_types:
 
             customer_id:                CHAR 32
             customer_unique_id:         CHAR 32
             customer_zip_code_prefix:   INTEGER
-            customer_city:              VARCHAR 50
-            customer_state:             CHAR 2
 
     sellers:
 
         name_file:          olist_sellers_dataset.csv
         gzip:               False
         na_values:          None
+        if_echec:           impute
         primary_keys:       ['seller_id']
-        multi_foreign_keys:
+        foreign_keys:
+
             seller_zip_code_prefix:    geolocation.geolocation_zip_code_prefix
-            seller_city:                geolocation.geolocation_city
-            seller_state:               geolocation.geolocation_state
 
         column_types:
 
             seller_id:                CHAR 32
             seller_zip_code_prefix:   INTEGER
-            seller_city:              VARCHAR 50
-            seller_state:             CHAR 2
 
     products:
 
         name_file:          olist_products_dataset.csv
         gzip:               False
         na_values:          None
+        if_echec:           table
         primary_keys:       ['product_id']
         column_types:
 
@@ -103,6 +102,7 @@ tables:
         name_file:          olist_orders_dataset.csv
         gzip:               False
         na_values:          None
+        if_echec:           table
         primary_keys:       ['order_id']
         foreign_keys:
 
@@ -124,6 +124,7 @@ tables:
         name_file:          olist_order_items_dataset.csv
         gzip:               False
         na_values:          None
+        if_echec:           table
         primary_keys:       ['order_id', 'order_item_id']
         foreign_keys:
 
@@ -146,6 +147,7 @@ tables:
         name_file:          olist_order_reviews_dataset.csv
         gzip:               False
         na_values:          None
+        if_echec:           table
         primary_keys:       ['review_id', 'order_id']
         foreign_keys:
 
@@ -166,6 +168,7 @@ tables:
         name_file:          olist_order_payments_dataset.csv
         gzip:               False
         na_values:          None
+        if_echec:           table
         primary_keys:       ['order_id', 'payment_sequential']
         foreign_keys:
 
@@ -184,6 +187,7 @@ tables:
         name_file:          product_category_name_translation.csv
         gzip:               False
         na_values:          None
+        if_echec:           table
         primary_keys:       ['product_category_name']
 
         column_types:
