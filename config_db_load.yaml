@@ -61,6 +61,8 @@ tables:
             customer_id:                CHAR 32
             customer_unique_id:         CHAR 32
             customer_zip_code_prefix:   INTEGER
+            customer_city:              VARCHAR 50
+            customer_state:             CHAR 2
 
     sellers:
 
@@ -77,6 +79,8 @@ tables:
 
             seller_id:                CHAR 32
             seller_zip_code_prefix:   INTEGER
+            seller_city:              VARCHAR 50
+            seller_state:             CHAR 2
 
     products:
 
