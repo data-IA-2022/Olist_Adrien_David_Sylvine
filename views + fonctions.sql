@@ -81,3 +81,18 @@ create view order_info as
 	    ) as b
 	  	using (order_id)
 ;
+
+create or replace view Customer_unique_spending as 
+	select customer_unique_id, count(customer_id) as nb_order, sum(nb_product) as total_product, sum(sum_price) as total_sum  from (
+		select order_id, customer_id, count(product_id) as nb_product, sum(price) as sum_price from orders
+		left join order_items oi
+		using (order_id)
+		group by order_id, customer_id
+	) as a
+	left join (
+		select customer_unique_id, customer_id from customers
+		) as b
+		using (customer_id)
+	group by customer_unique_id
+	;
+	
