@@ -96,3 +96,131 @@ create or replace view Customer_unique_spending as
 	group by customer_unique_id
 	;
 	
+
+/* vues multiples question 1 */
+drop view if exists question1_join cascade;
+
+create view question1_join as 
+  SELECT 
+    oi."order_id" AS "order_id", 
+    oi."order_item_id" AS "order_item_id", 
+    oi."product_id" AS "product_id", 
+    p.product_category_name as product_category_name,
+    oi."seller_id" AS "seller_id", 
+    oi."shipping_limit_date" AS "shipping_limit_date", 
+    oi."price" AS "price", 
+    oi."freight_value" AS "freight_value", 
+    o."customer_id" AS "customer_id", 
+    o."order_status" AS "order_status", 
+    o."order_purchase_timestamp" AS "order_purchase_timestamp", 
+    c."customer_zip_code_prefix" AS "customer_zip_code_prefix", 
+    bs."abbreviation" AS "abbreviation", 
+    bs."region" AS "region",
+    DATE(date_trunc('month', order_purchase_timestamp) + interval '1 month - 1 day') as date_truncated
+  FROM order_items oi 
+  LEFT JOIN orders AS o ON oi."order_id" = o."order_id" 
+  LEFT JOIN customers AS c ON o."customer_id" = c."customer_id"
+  left join geolocation as g on c.customer_zip_code_prefix = g.geolocation_zip_code_prefix 
+  LEFT JOIN brazil_states AS bs ON g.geolocation_state  = bs."abbreviation"
+  left join products p on oi.product_id = p.product_id
+
+
+/* creer vues par region avec les 10 produits au plus gros CA */
+drop view if exists question1_Center_West;
+create view question1_Center_West as 
+  select 
+    max(product_id) as product_id , 
+    max(region) as region, 
+    count(product_id) as volume,
+    count(distinct order_id) as commandes,
+    sum(price) as chiffre_aff
+  FROM  question1_join q 
+  WHERE region = 'Center West'
+  GROUP BY q.product_id
+  ORDER BY chiffre_aff desc
+  limit 10;
+
+drop view if exists question1_North;
+create view question1_North as 
+  select 
+    max(product_id) as product_id , 
+    max(region) as region, 
+    count(product_id) as volume,
+    count(distinct order_id) as commandes,
+    sum(price) as chiffre_aff
+  FROM question1_join q 
+  WHERE region = 'North'
+  GROUP BY q.product_id
+  ORDER BY chiffre_aff desc
+  limit 10;
+
+drop view if exists question1_Northeast;
+create view question1_Northeast as 
+  select 
+    max(product_id) as product_id , 
+    max(region) as region, 
+    count(product_id) as volume,
+    count(distinct order_id) as commandes,
+    sum(price) as chiffre_aff
+  FROM  question1_join q 
+  WHERE region = 'Northeast'
+  GROUP BY q.product_id
+  ORDER BY chiffre_aff desc
+  limit 10;
+
+drop view if exists question1_Southeast;
+create view question1_Southeast as 
+  select 
+    max(product_id) as product_id , 
+    max(region) as region, 
+    count(product_id) as volume,
+    count(distinct order_id) as commandes,
+    sum(price) as chiffre_aff
+  FROM 
+  question1_join q 
+  WHERE region = 'Southeast'
+  GROUP BY q.product_id
+  ORDER BY chiffre_aff desc
+  limit 10;
+
+drop view if exists question1_South;
+create view question1_South as 
+  select 
+    max(product_id) as product_id , 
+    max(region) as region, 
+    count(product_id) as volume,
+    count(distinct order_id) as commandes,
+    sum(price) as chiffre_aff
+  FROM 
+  question1_join q 
+  WHERE region = 'South'
+  GROUP BY q.product_id
+  ORDER BY chiffre_aff desc
+  limit 10;
+
+/* creation view pour question 6*/
+create view question6_join as 
+  SELECT 
+    oi."order_id" AS "order_id", 
+    oi."order_item_id" AS "order_item_id", 
+    oi."product_id" AS "product_id", 
+    p.product_category_name as product_category_name,
+    oi."seller_id" AS "seller_id", 
+    oi."price" AS "price", 
+    oi."freight_value" AS "freight_value", 
+    o."customer_id" AS "customer_id", 
+    o."order_status" AS "order_status", 
+    bsc."abbreviation" AS customer_state, 
+    bsc."region" AS "customer_region",
+    bss."abbreviation" AS seller_state, 
+    bss."region" AS "seller_region",
+    DATE(date_trunc('month', order_purchase_timestamp) + interval '1 month - 1 day') as date_truncated
+  FROM order_items oi 
+  LEFT JOIN orders o ON oi."order_id" = o."order_id" 
+  LEFT JOIN customers c ON o."customer_id" = c."customer_id"
+  left join geolocation gc on c.customer_zip_code_prefix = gc.geolocation_zip_code_prefix 
+  left join sellers s on oi.seller_id = s.seller_id
+  left join geolocation gs on s.seller_zip_code_prefix = gs.geolocation_zip_code_prefix 
+  LEFT JOIN brazil_states bsc ON gc.geolocation_state  = bsc."abbreviation"
+  LEFT JOIN brazil_states bss ON gs.geolocation_state  = bss."abbreviation"
+  left join products p on oi.product_id = p.product_id
