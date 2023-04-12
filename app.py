@@ -16,10 +16,10 @@ OLIST=config['pgsql_writer']
 print('OLIST=', OLIST)
 engine = create_engine(OLIST)
 print(engine)
-
+ 
 
 @app.route("/")
-def hello_world():
+def hello_world(): 
     with Session(engine) as session:
         it = session.query(ProductCategory).all()
     return render_template('olist_trad.html', it=it)
