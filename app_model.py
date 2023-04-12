@@ -29,3 +29,7 @@ class ProductCategory(Base):
     def get_fr(self):
         # getter sur le champ product_category_name_french
         return self.product_category_name_french
+    
+    def get_en(self):
+        # getter sur le champ product_category_name_french
+        return self.product_category_name_english

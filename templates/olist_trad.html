@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Affichage de tous les items de la database</title>
+</head>
+<body>
+
+<h1>Traduction</h1>
+
+<table>
+    <tr><th>ID</th><th>EN</th><th>FR</th></tr>
+{%for x in it %}
+    <tr><td>{{x.product_category_name}}</td>
+        <td>{{x.product_category_name_english}}</td>
+        <td>
+            <form id="myForm" action="/api/category" method="post">
+                <input type="hidden" name='cat' value="{{x.product_category_name}}"/>
+                <input type="text" name="fr" value="{{x.product_category_name_french}}"></input><input type="submit" value="MaJ">
+            </form>
+        </td></tr>
+{%endfor%}
+</table>
+
+</body>
+</html> 
+
+
