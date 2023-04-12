@@ -7,11 +7,11 @@ from sqlalchemy import create_engine, text
 app = Flask(__name__)
 
 # for local developpement
-# with open('config.yaml', 'r') as file:
-#     config = yaml.safe_load(file)
-# OLIST=config['pgsql_writer']
+with open('config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
+OLIST=config['pgsql_writer']
 
-OLIST=os.environ['OLIST'] # on docker
+# OLIST=os.environ['OLIST'] # on docker
 
 print('OLIST=', OLIST)
 engine = create_engine(OLIST)
