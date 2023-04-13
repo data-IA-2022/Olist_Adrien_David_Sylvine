@@ -29,6 +29,7 @@
             <td> 
                 <form id="myForm" action="/api/category" method="post">
                     <input type="hidden" name='cat' value="{{x.product_category_name}}"/>
+                    <input type="hidden" name='key' value="{{key}}"/>
                     <input type="text" name="fr" value="{{x.product_category_name_french}}"></input><input type="submit" value="OK">
                 </form>
             </td></tr>
