@@ -2,10 +2,10 @@ from googletrans import Translator
 import requests
 
 # adresse de base: pointe vers le port 5000 de la VM
-# base_url="http://groupe2-ads.francecentral.cloudapp.azure.com:5000/" 
+base_url="http://groupe2-ads.francecentral.cloudapp.azure.com:5000/" 
 
 # pour dévelopement en local:
-base_url="http://localhost:5000/" 
+# base_url="http://localhost:5000/" 
 print(f'base_url : {base_url}')
 
 translator = Translator(service_urls=['translate.googleapis.com'])
