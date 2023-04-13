@@ -147,3 +147,5 @@ dataset
 # config_file
 config_local_david.yaml
 config_db_load_local.yaml
+ansible.cfg
+hosts.yml

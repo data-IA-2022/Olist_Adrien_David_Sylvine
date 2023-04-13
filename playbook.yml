@@ -1,0 +1,46 @@
+---
+# Playbook Ansible
+- name: Update GIT projet olist
+  hosts:
+    - groupe2-ads.francecentral.cloudapp.azure.com
+  tasks:
+    - name: Projet Olist branche 'main' à jour sur cible
+      ansible.builtin.git:
+        repo: 'git@github.com:data-IA-2022/Olist_Adrien_David_Sylvine.git'
+        dest: ~/Olist_Adrien_David_Sylvine
+        version: main
+        update: true
+        force: true
+
+    - name: Projet Olist start container postgres
+      community.docker.docker_container:
+        name: postgres
+        image: postgres:latest
+        state: started
+        restart_policy: unless-stopped
+        
+    - name: Projet Olist start container metabase
+      community.docker.docker_container:
+        name: metabase
+        image: metabase/metabase
+        state: started
+        restart_policy: unless-stopped
+
+    - name: Projet Olist image Docker
+      community.docker.docker_image:
+        name: olist
+        build:
+          path: ~/Olist_Adrien_David_Sylvine
+        source: build
+        force_source: true
+
+    - name: Projet Olist start container olist
+      community.docker.docker_container:
+        name: olist
+        image: olist
+        state: started
+        recreate: true
+        restart_policy: always
+        network_mode: host
+        env:
+          OLIST: postgresql+psycopg2://orm_user:api_orm@172.17.0.2/OList
