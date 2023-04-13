@@ -95,7 +95,88 @@ create or replace view Customer_unique_spending as
 		using (customer_id)
 	group by customer_unique_id
 	;
-	
+
+create materialized view customer_first_order as
+	select 
+		customer_unique_id,
+		nb_order,
+		nb_order_approved,
+		first_order_id,
+		first_order_timestamp
+	from (
+		select
+			c.customer_unique_id,
+			count(*) as nb_order
+		from customers c
+		join orders o
+			using (customer_id)
+		group by c.customer_unique_id
+	) t
+	left join (
+		select
+			c.customer_unique_id,
+			count(*) as nb_order_approved
+		from customers c
+		join orders o
+			using (customer_id)
+		where o.order_approved_at is not null
+		group by c.customer_unique_id
+	) as t2
+		using (customer_unique_id)
+	left join (
+		select
+		    c.customer_unique_id,
+		    o.order_id as first_order_id,
+		    t.first_order_timestamp
+		from customers c
+		left join orders o 
+		    using (customer_id)
+		inner join (
+		    select
+		        c2.customer_unique_id,
+		        min(o2.order_approved_at) as first_order_timestamp
+		    from customers c2
+		    left join orders o2
+		        using (customer_id)
+		    group by c2.customer_unique_id
+		) t
+		on (
+		    c.customer_unique_id = t.customer_unique_id and
+		    o.order_approved_at = t.first_order_timestamp
+		)
+	) as t3
+		using (customer_unique_id)
+;
+
+create view time_order as select
+    t.order_id,
+    g.geolocation_state,
+    t.order_purchase_timestamp,
+    t.approvement_time,
+    t.carrier_deliver_time,
+    t.customer_deliver_time,
+    t.first_review_after_delivery,
+    t.gap_estimated_delivery
+from (
+    select
+        o.order_id,
+        o.customer_id,
+        o.order_purchase_timestamp,
+        o.order_approved_at - o.order_purchase_timestamp as "approvement_time",
+        o.order_delivered_carrier_date - o.order_purchase_timestamp as "carrier_deliver_time",
+        o.order_delivered_customer_date - o.order_purchase_timestamp as "customer_deliver_time",
+        min(or2.review_creation_date) - o.order_delivered_customer_date as "first_review_after_delivery",
+        o.order_delivered_customer_date - o.order_estimated_delivery_date as "gap_estimated_delivery"
+    from orders o
+    left join order_reviews or2
+        using (order_id)
+    group by order_id
+    ) as t
+left join customers c
+    using (customer_id)
+left join geolocation g
+    on c.customer_zip_code_prefix = g.geolocation_zip_code_prefix 
+;
 
 /* vues multiples question 1 */
 drop view if exists question1_join cascade;
