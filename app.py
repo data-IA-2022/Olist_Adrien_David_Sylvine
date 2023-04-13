@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, redirect, url_for
+from flask import Flask, jsonify, render_template, request, redirect, url_for, Response
 from app_model import *
 from sqlalchemy.orm import Session
 import yaml, os
@@ -6,14 +6,16 @@ from sqlalchemy import create_engine, text
 
 app = Flask(__name__)
 
+# key="ee55f77145dc4e62b3d480efbdec7589" # Clé d'accès à l'API - sécurité
+
 # for local developpement
-# with open('config.yaml', 'r') as file:
-#     config = yaml.safe_load(file)
-# OLIST=config['pgsql_writer']
+with open('config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
+OLIST=config['pgsql_writer']
 
 
 # for docker run
-OLIST=os.environ['OLIST'] 
+# OLIST=os.environ['OLIST'] 
 
 print('OLIST=', OLIST)
 engine = create_engine(OLIST)
@@ -27,15 +29,20 @@ def hello_world():
     return render_template('olist_trad.html', it=it)
 
 
+
 @app.route("/api/categories", methods=['GET'])
 def cat_list():
+    # print('LES HEADERS SONT ICI \n: ', request.headers)
+    # if 'Subscription-Key' not in request.headers or request.headers['Subscription-Key'] != key:
+    #     return Response('Pas OK', 401)
     with Session(engine) as session:
         it = session.query(ProductCategory).all()
-    print(it)
+    print(it) 
     return jsonify([pc.to_json() for pc in it])
 
 
-# 
+
+
 @app.route("/api/category", methods=['POST'])
 def cat_update():
     pk=request.form['cat'] # est dictionnaire contenant les valeurs 
