@@ -1,12 +1,13 @@
 import gzip
 import time
 from math import ceil
-from utils import calc_time, relative_path, get_config
 
 import pandas as pd
 import sqlalchemy.types as SQLAT
 import yaml
-from sqlalchemy import Column, ForeignKey, MetaData, Table, ForeignKeyConstraint
+from sqlalchemy import Column, ForeignKey, ForeignKeyConstraint, MetaData, Table
+
+from utils import calc_time, get_config, relative_path
 
 
 def convert_dtype(types: dict) -> dict:

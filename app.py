@@ -1,8 +1,12 @@
-from flask import Flask, jsonify, render_template, request, redirect, url_for
-from app_model import *
-from sqlalchemy.orm import Session
-import yaml, os
+import os
+
+import yaml
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 from sqlalchemy import create_engine, text
+from sqlalchemy.orm import Session
+
+from app_model import *
+
 
 app = Flask(__name__)
 
@@ -18,7 +22,7 @@ OLIST=os.environ['OLIST']
 print('OLIST=', OLIST)
 engine = create_engine(OLIST)
 print(engine)
- 
+
 
 @app.route("/")
 def hello_world(): 
@@ -35,7 +39,6 @@ def cat_list():
     return jsonify([pc.to_json() for pc in it])
 
 
-# 
 @app.route("/api/category", methods=['POST'])
 def cat_update():
     pk=request.form['cat'] # est dictionnaire contenant les valeurs 

@@ -76,9 +76,13 @@ def connect_to_db(config_file):
         from sqlalchemy import create_engine
 
         return create_engine(url)
-from os.path import join, dirname
+
+
+from os.path import dirname, join
+
 import yaml
 from sqlalchemy import create_engine
+
 
 def get_config(cnx):
     config_file = relative_path("config_local_david.yaml")
