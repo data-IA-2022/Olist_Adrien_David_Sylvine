@@ -232,3 +232,17 @@ LEFT JOIN brazil_states bss ON gs.geolocation_state  = bss."abbreviation"
 left join products p on oi.product_id = p.product_id
 where order_status !='canceled'
 ;
+
+create or replace view quality as
+    select product_id, product_description_lenght, product_photos_qty, count(order_id) as nb_order from products p
+    left join order_items oi 
+        using (product_id)
+    group by product_id, product_name_lenght, product_photos_qty
+    order by nb_order desc
+;
+
+CREATE ROLE orm_user
+WITH LOGIN
+PASSWORD 'api_orm';
+
+GRANT select, insert, update, delete ON product_category_name_translation TO orm_user;
