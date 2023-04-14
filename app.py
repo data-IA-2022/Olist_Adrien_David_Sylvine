@@ -1,8 +1,12 @@
-from flask import Flask, jsonify, render_template, request, redirect, url_for, Response
-from app_model import *
+import os
+
+import yaml
+from flask import Flask, Response, jsonify, redirect, render_template, request, url_for
+from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-import yaml, os
-from sqlalchemy import create_engine, text
+
+from app_model import *
+
 
 app = Flask(__name__)
 
@@ -13,21 +17,19 @@ secret="ef55f77145dc4e62b3d480efbdeb7589"
 #     config = yaml.safe_load(file)
 # OLIST=config['pgsql_writer']
 
-
 # for docker run
 OLIST=os.environ['OLIST'] 
 
 print('OLIST=', OLIST)
 engine = create_engine(OLIST)
 print(engine)
- 
+
 
 @app.route("/")
 def hello_world(): 
     with Session(engine) as session:
         it = session.query(ProductCategory).all()
     return render_template('olist_trad.html', it=it, key=secret)
-
 
 
 @app.route("/api/categories", methods=['GET'])

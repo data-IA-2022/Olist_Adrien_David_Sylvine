@@ -1,17 +1,19 @@
-from app_model import *
-import json, yaml
+import json
+
+import yaml
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
+
+from app_model import *
+
 
 with open('config.yaml', 'r') as file:
     config = yaml.safe_load(file)
 #print(config)
 engine = create_engine(config['pgsql_writer'])
 
-
 print('OK')
 print(engine)
-
 
 pc=ProductCategory(product_category_name='cat1', product_category_name_english='cat_en')
 print(pc)
@@ -22,7 +24,6 @@ print('en json:', pcjson)
 print('Apres modif:')
 pc.set_fr('cat_FR') # Utilisation du setter
 print(pc)
-
 
 print('FR:', pc.get_fr())
 
@@ -41,8 +42,6 @@ with Session(engine) as session:
     #print(json.dumps(obj))
 
     print('count', session.query(ProductCategory).count())
-
-
 
     '''pc2 = session.query(ProductCategory).get('bebes')
     print(pc2)

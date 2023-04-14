@@ -1,8 +1,10 @@
-import pandas as pd
-from unidecode import unidecode
 from collections import Counter
 
+import pandas as pd
+from unidecode import unidecode
+
 from utils import relative_path
+
 
 df = pd.read_csv(relative_path("data", "olist_geolocation_dataset.csv"))
 

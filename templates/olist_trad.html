@@ -1,49 +1,47 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Affichage de tous les items de la database</title>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="./static/style.css">
+    <title>Affichage de tous les items de la database</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./static/style.css">
 </head>
+
 <body>
 
-<div class="w3-display-container w3-animate-opacity">
-    <img class = cover src="https://storage.googleapis.com/kaggle-datasets-images/55151/105464/d59245a7014a35a35cc7f7b721de4dae/dataset-cover.png?t=2018-09-21-16-21-21" alt="boat" style="width:100%;min-height:350px;max-height:600px;" object-fit = cover>
-</div>    
+    <div class="w3-display-container w3-animate-opacity">
+        <img class=cover
+            src="https://storage.googleapis.com/kaggle-datasets-images/55151/105464/d59245a7014a35a35cc7f7b721de4dae/dataset-cover.png?t=2018-09-21-16-21-21"
+            alt="boat" style="width:100%;min-height:350px;max-height:600px;" object-fit=cover>
+    </div>
 
-<div class="w3-quarter">
-    <p class=p1>
-    </p>
-    
-</div>    
-    
-<div class="w3-half">
-    <br>
-    <h1>Ajout de traductions en Français pour les catégories de produits disponibles sur la plateforme OList</h1>      
-    <br><br><br>
-    <table class= "w3-table-all">
-        <tr><th>Portugais</th><th>Anglais</th><th>Français</th></tr>
-    {%for x in it %}
-        <tr><td>{{x.product_category_name}}</td>
-            <td>{{x.product_category_name_english}}</td>
-            <td> 
-                <form id="myForm" action="/api/category" method="post">
-                    <input type="hidden" name='cat' value="{{x.product_category_name}}"/>
-                    <input type="hidden" name='key' value="{{key}}"/>
-                    <input type="text" name="fr" value="{{x.product_category_name_french}}"></input><input type="submit" value="OK">
-                </form>
-            </td></tr>
-    {%endfor%}
-    </table>
-
-</div>
-    
-<div class="w3-quarter">
-    <p class=p1>
-    </p>
-</div>
+    <div class="w3-half">
+        <br>
+        <h1>Ajout de traductions en Français pour les catégories de produits disponibles sur la plateforme OList</h1>
+        <br><br><br>
+        <table class="w3-table-all">
+            <tr>
+                <th>Portugais</th>
+                <th>Anglais</th>
+                <th>Français</th>
+            </tr>
+            {%for x in it %}
+            <tr>
+                <td>{{x.product_category_name}}</td>
+                <td>{{x.product_category_name_english}}</td>
+                <td>
+                    <form id="myForm" action="/api/category" method="post">
+                        <input type="hidden" name='cat' value="{{x.product_category_name}}">
+                        <input type="hidden" name='key' value="{{key}}">
+                        <input type="text" name="fr" value="{{x.product_category_name_french}}">
+                        <input type="submit" value="OK">
+                    </form>
+                </td>
+            </tr>
+            {%endfor%}
+        </table>
+    </div>
 
 </body>
-</html> 
 
-
+</html>
